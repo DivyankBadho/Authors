@@ -7,6 +7,9 @@ const BooksScreen = () => {
   const route = useRoute();
   const { author } = route.params;
   const[editedbooks, seteditedbooks]= useState(false);
+  const[updatedbooks, setUpdatedBooks]= useState(author.books);
+
+ 
 
 
   const handleInputChange = () => {
@@ -16,6 +19,26 @@ const BooksScreen = () => {
   
     const updateBookName=(text,id)=>{
           console.log(text,id)
+          const newBookData= updatedbooks.map((item)=>{
+            if(item.id===id){
+              console.log(text)
+              return {
+                ...item,
+                name: text
+              }
+            }
+            else{
+               return {
+                ...item,
+               }
+            }
+          
+         })
+         console.log(newBookData)
+         setUpdatedBooks([...newBookData])
+    }
+    const onSubmit=()=>{
+      console.log(updatedbooks)
     }
 
   return (
@@ -24,24 +47,40 @@ const BooksScreen = () => {
       <Text style={styles.title}>Books for Author: {author.name}</Text> 
       { editedbooks==false ?
        <Button title="EDIT"  onPress={()=>handleInputChange()} style={{marginLeft: 60, alignItem: "right"}}/>
-      : <Button title="Save"  onPress={()=>seteditedbooks(false)} style={{marginLeft: 60, alignItem: "right"}}/>
+      : <Button title="Save"  onPress={()=>{
+       
+         onSubmit() ;
+         seteditedbooks(false);
+      }} style={{marginLeft: 60, alignItem: "right"}}/>
       }
-    </View>
+    </View >
+   
       <FlatList
         data={author.books}
         keyExtractor={(item) => item.id.toString()}
         renderItem={(item) => {
-{editedbooks == true ? (
+         
+           return < >
+           
+            {editedbooks == true ? (
             <TextInput
             style={styles.editInput}
-            defaultValue={item.name}
+            defaultValue={item.item.name}
             
-            onChangeText={(text) => updateBookName( text,item.id)}
+            onChangeText={(text) => updateBookName( text,item.item.id)}
           />
           ):(
-           <Text style={styles.bookName}>  {item.name}  </Text>
-          )} }}
+           <Text style={styles.bookName}>  {item.item.name}  </Text>
+           
+          )}
+          <Text style={styles.bookId}> ID: {item.item.id}</Text>
+
+          
+          </> 
+          
+          }}
         />
+         
     </View>
   );
 };
