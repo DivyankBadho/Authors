@@ -5,32 +5,17 @@ import { useMutation } from '@apollo/client';
 import { useQuery, gql } from "@apollo/client";
 
 const ADD_AUTHOR_MUTATION = gql`
-mutation MyMutation($name: String!, $id: String!, $bookName: String!, $bookId: String!, $count: Int!) {
-  insert_author_author_one(object: {
-    name: $name,
-    id: $id,
-    books: {
-      data: {
-        name: $bookName,
-        id: $bookId
-      }
-    }
-  }) returning{
-    name
-    id
-    books {
+mutation MyMutation($name: String!, $books: [book_book_insert_input!]!) {
+  insert_author_author(objects: {name: $name, books: {data: $books}}) {
+    returning {
       name
       id
-    }
-    books_aggregate {
-      aggregate {
-        count(columns: books_id)
+      books {
+        name
+        id
       }
+    
     }
-  }
-  update_author_author_by_pk(pk_columns: {id: $id}, _set: {books_aggregate: {count: $count}}) {
-    name
-    id
   }
 }
 `;
@@ -58,17 +43,30 @@ const AddAuthorForm = () => {
   const [authorId, setAuthorId] = useState("");
   const [books, setBooks] = useState([{ name: "", id: "" }]);
   const [totalBooksCount, setTotalBooksCount] = useState("");
-
-  const [addAuthor] = useMutation(ADD_AUTHOR_MUTATION);
+  const [addAuthor,{data,loading,error} ] = useMutation(ADD_AUTHOR_MUTATION);
   const navigation = useNavigation();
 
-  const handleSubmit = async () => {
-    try {
-      const booksInput = books.map(({ name, id }) => ({ name, id }));
+  const handleSubmit = () => {
+    
+      const booksInput = books.map(({ name}) => ({ name }));
+      // console.log("data is transfered")
+      console.log(authorName)
+      console.log(booksInput)
 
-      await addAuthor({
-        variables: { name: authorName, id: authorId, books: booksInput },
-        refetchQueries: [{ query: MY_QUERY }],
+       addAuthor({
+        variables: { 
+          name:authorName,
+          books: booksInput
+          
+        },
+        // refetchQueries: [{ query: MY_QUERY }],
+        onCompleted:((data)=>{
+          console.log("incomig data==",data)
+        }),
+        onError:(error)=>{
+          console.log("incoming eror==",error)
+        }
+        
       });
 
       setAuthorName("");
@@ -99,35 +97,18 @@ const AddAuthorForm = () => {
         placeholder="Author Name"
         value={authorName}
         onChangeText={(text) => setAuthorName(text)}
+
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Author ID"
-        value={authorId}
-        onChangeText={(text) => setAuthorId(text)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Total Books Count"
-        value={totalBooksCount}
-        onChangeText={(text) => setTotalBooksCount(text)}
-        keyboardType="numeric"
-      />
+
       {books.map((book, index) => (
-        <View key={index}>
+       return ( <View key={index}>
           <TextInput
             style={styles.input}
             placeholder={`Book Name ${index + 1}`}
             value={book.name}
             onChangeText={(text) => updateBook(index, "name", text)}
           />
-          <TextInput
-            style={styles.input}
-            placeholder={`Book ID ${index + 1}`}
-            value={book.id}
-            onChangeText={(text) => updateBook(index, "id", text)}
-          />
-        </View>
+        </View> )
       ))}
       <TouchableOpacity style={styles.addButton} onPress={addBook}>
         <Text style={styles.addButtonText}>Add Book</Text>

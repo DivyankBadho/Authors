@@ -40,15 +40,7 @@ const Authors=()=>{
 
     const navigateToBooks = (author) => {
         navigation.navigate("Books", { author });
-      };
-
-     const navigateToaddAuthor = () => {
-        navigation.navigate("addAuthor"); // Navigate to the AddAuthorScreen
-      };
-
-  useEffect(()=>{
-    console.log('GraphQL ===', data)
-  })
+    }
     return(
         
         <View style={styles.container}>
@@ -112,7 +104,7 @@ const styles=StyleSheet.create({
     marginBottom: 10,
   },
   roundBoundary: {
-    backgroundColor: "lightpink",
+    backgroundColor: "ligtpink",
     width: 40,
     height: 40,
     borderRadius: 20, // Half of the width and height to make it round
