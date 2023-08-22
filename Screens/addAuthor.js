@@ -18,10 +18,6 @@ mutation MyMutation($name: String!, $books: [book_book_insert_input!]!) {
     }
   }
 }
-
-
-
-
 `;
 
 const MY_QUERY = gql`
@@ -47,7 +43,6 @@ const AddAuthorForm = () => {
   const [authorId, setAuthorId] = useState("");
   const [books, setBooks] = useState([{ name: "", id: "" }]);
   const [totalBooksCount, setTotalBooksCount] = useState("");
-
   const [addAuthor,{data,loading,error} ] = useMutation(ADD_AUTHOR_MUTATION);
   const navigation = useNavigation();
 
@@ -73,18 +68,19 @@ const AddAuthorForm = () => {
         }
         
       });
-      
 
       setAuthorName("");
       setAuthorId("");
       setTotalBooksCount("");
       setBooks([{ name: "", id: "" }]);
       navigation.navigate("Authors"); 
-     
+    } catch (error) {
+      console.error("Error adding author:", error);
+    }
   };
 
   const addBook = () => {
-    setBooks([...books, { name: " ", id: " " }]);
+    setBooks([...books, { name: "", id: "" }]);
   };
 
   const updateBook = (index, field, value) => {
@@ -101,26 +97,18 @@ const AddAuthorForm = () => {
         placeholder="Author Name"
         value={authorName}
         onChangeText={(text) => setAuthorName(text)}
-       /> 
-  
-    
-      <TextInput
-        style={styles.input}
-        placeholder="Total Books Count"
-        value={totalBooksCount}
-        onChangeText={(text) => setTotalBooksCount(text)}
-        keyboardType="numeric"
+
       />
+
       {books.map((book, index) => (
-        <View key={index}>
+       return ( <View key={index}>
           <TextInput
             style={styles.input}
             placeholder={`Book Name ${index + 1}`}
             value={book.name}
             onChangeText={(text) => updateBook(index, "name", text)}
           />
-         
-        </View>
+        </View> )
       ))}
       <TouchableOpacity style={styles.addButton} onPress={addBook}>
         <Text style={styles.addButtonText}>Add Book</Text>

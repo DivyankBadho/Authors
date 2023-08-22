@@ -40,14 +40,7 @@ const Authors=()=>{
 
     const navigateToBooks = (author) => {
         navigation.navigate("Books", { author });
-        // console.log(id)
-      };
-
-     
-
-  useEffect(()=>{
-    console.log('GraphQL ===', data.author_author[0])
-  })
+    }
     return(
         
         <View style={styles.container}>

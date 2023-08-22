@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { View, Text, StyleSheet, FlatList ,Button, TextInput} from "react-native";
 import { useRoute } from "@react-navigation/native";
@@ -25,14 +26,11 @@ const BooksScreen = () => {
        <Button title="EDIT"  onPress={()=>handleInputChange()} style={{marginLeft: 60, alignItem: "right"}}/>
       : <Button title="Save"  onPress={()=>seteditedbooks(false)} style={{marginLeft: 60, alignItem: "right"}}/>
       }
-       </View>
-
-   
+    </View>
       <FlatList
         data={author.books}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.bookContainer}>
              {editedbooks==true ? (
                <TextInput
                style={styles.editInput}
@@ -43,14 +41,7 @@ const BooksScreen = () => {
              ):(
               <Text style={styles.bookName}>  {item.name}  </Text>
              )}
-           
-            
-            <Text style={styles.bookId}>ID: {item.id}</Text>
-           
-          </View>
-        )}
-      />
-      
+        />
     </View>
   );
 };
