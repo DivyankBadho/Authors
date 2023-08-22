@@ -30,17 +30,17 @@ const BooksScreen = () => {
       <FlatList
         data={author.books}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-             {editedbooks==true ? (
-               <TextInput
-               style={styles.editInput}
-               defaultValue={item.name}
-               
-               onChangeText={(text) => updateBookName( text,item.id)}
-             />
-             ):(
-              <Text style={styles.bookName}>  {item.name}  </Text>
-             )}
+        renderItem={(item) => {
+{editedbooks == true ? (
+            <TextInput
+            style={styles.editInput}
+            defaultValue={item.name}
+            
+            onChangeText={(text) => updateBookName( text,item.id)}
+          />
+          ):(
+           <Text style={styles.bookName}>  {item.name}  </Text>
+          )} }}
         />
     </View>
   );

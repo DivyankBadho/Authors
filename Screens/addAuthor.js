@@ -74,10 +74,7 @@ const AddAuthorForm = () => {
       setTotalBooksCount("");
       setBooks([{ name: "", id: "" }]);
       navigation.navigate("Authors"); 
-    } catch (error) {
-      console.error("Error adding author:", error);
-    }
-  };
+  } 
 
   const addBook = () => {
     setBooks([...books, { name: "", id: "" }]);
@@ -101,14 +98,14 @@ const AddAuthorForm = () => {
       />
 
       {books.map((book, index) => (
-       return ( <View key={index}>
+   <View key={index}>
           <TextInput
             style={styles.input}
             placeholder={`Book Name ${index + 1}`}
             value={book.name}
             onChangeText={(text) => updateBook(index, "name", text)}
           />
-        </View> )
+        </View> 
       ))}
       <TouchableOpacity style={styles.addButton} onPress={addBook}>
         <Text style={styles.addButtonText}>Add Book</Text>
