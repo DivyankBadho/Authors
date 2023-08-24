@@ -2,14 +2,29 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, FlatList ,Button, TextInput} from "react-native";
 import { useRoute } from "@react-navigation/native";
+import { useMutation,gql } from "@apollo/client";
 
+const UPDATE_BOOK = gql`
+mutation MyMutation($id: String!, $name: String!) {
+  update_book_book(where: {id: {_eq: $id}}, _set: {name: $name}) {
+    returning {
+      author {
+        books {
+          name
+          id
+        }
+      }
+    }
+  }
+}
+`
 const BooksScreen = () => {
   const route = useRoute();
   const { author } = route.params;
   const[editedbooks, seteditedbooks]= useState(false);
   const[updatedbooks, setUpdatedBooks]= useState(author.books);
 
- 
+  const [updateBookMutation] = useMutation(UPDATE_BOOK);
 
 
   const handleInputChange = () => {
@@ -18,10 +33,18 @@ const BooksScreen = () => {
     }
   
     const updateBookName=(text,id)=>{
-          console.log(text,id)
+          // console.log(text,id)
+
+          updateBookMutation({
+            variables:{
+              id, name:text
+              
+            },
+          });
+         
           const newBookData= updatedbooks.map((item)=>{
             if(item.id===id){
-              console.log(text)
+              // console.log(text)
               return {
                 ...item,
                 name: text
@@ -34,12 +57,16 @@ const BooksScreen = () => {
             }
           
          })
-         console.log(newBookData)
+        //  console.log(newBookData)
          setUpdatedBooks([...newBookData])
     }
     const onSubmit=()=>{
-      console.log(updatedbooks)
-    }
+      const updatedBookNames = updatedbooks.map((book) => book.name);
+      // console.log("Updated Book Names:", updatedBookNames);
+
+      
+    
+    };
 
   return (
     <View style={styles.container}>
@@ -66,7 +93,6 @@ const BooksScreen = () => {
             <TextInput
             style={styles.editInput}
             defaultValue={item.item.name}
-            
             onChangeText={(text) => updateBookName( text,item.item.id)}
           />
           ):(
