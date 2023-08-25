@@ -1,19 +1,29 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, FlatList ,Button, TextInput} from "react-native";
 import { useRoute } from "@react-navigation/native";
-import { useMutation,gql } from "@apollo/client";
+import { useMutation,gql, useQuery } from "@apollo/client";
+import { object } from "prop-types";
+
+
+
+const GET_AUTHOR_BOOKS =gql`
+query MyQuery($id: String!) {
+  book_book(where: {author: {id: {_eq: $id}}}) {
+    name
+    id
+  }
+}
+
+`
 
 const UPDATE_BOOK = gql`
-mutation MyMutation($id: String!, $name: String!) {
-  update_book_book(where: {id: {_eq: $id}}, _set: {name: $name}) {
+mutation MyMutation($objects: [book_book_insert_input!]!) {
+  insert_book_book(objects: $objects, on_conflict: {constraint: book_pkey, update_columns: name}) {
     returning {
-      author {
-        books {
-          name
-          id
-        }
-      }
+      id
+      name
+      authorId
     }
   }
 }
@@ -22,52 +32,98 @@ const BooksScreen = () => {
   const route = useRoute();
   const { author } = route.params;
   const[editedbooks, seteditedbooks]= useState(false);
-  const[updatedbooks, setUpdatedBooks]= useState(author.books);
-
+  
+  const {data,error,loading}= useQuery(GET_AUTHOR_BOOKS ,{
+    variables: { id: author?.id },
+  });
+  
+  
+  
+  const[updatedbooks, setUpdatedBooks]= useState(data?.book_book);
+  
+  
   const [updateBookMutation] = useMutation(UPDATE_BOOK);
-
+    
+        // console.log(data)
+  //  useEffect(()=>{
+  //       console.log(updatedbooks)
+  //  })
+      //  console.log(updatedbooks)
+        
 
   const handleInputChange = () => {
           seteditedbooks(true)
           
     }
   
-    const updateBookName=(text,id)=>{
-          // console.log(text,id)
 
-          updateBookMutation({
-            variables:{
-              id, name:text
-              
-            },
-          });
-         
-          const newBookData= updatedbooks.map((item)=>{
-            if(item.id===id){
-              // console.log(text)
-              return {
-                ...item,
-                name: text
-              }
+    const updateBookName = (text, id) => {
+      updateBookMutation({
+        variables: {
+          objects: [
+            {
+              id,
+              name: text,
+              authorId: author.id
             }
-            else{
-               return {
-                ...item,
-               }
-            }
-          
-         })
-        //  console.log(newBookData)
-         setUpdatedBooks([...newBookData])
+          ]
+        },
+      }).then(() => {
+        
+        const newBookData = updatedbooks.map((item) => {
+          if (item.id === id) {
+            return {
+              ...item,
+              name: text
+            };
+          }
+          return item;
+        });
+        setUpdatedBooks(newBookData);
+      });
     }
-    const onSubmit=()=>{
-      const updatedBookNames = updatedbooks.map((book) => book.name);
-      // console.log("Updated Book Names:", updatedBookNames);
 
-      
+    
+    console.log(updatedbooks)
+    // const updateBookName=(text,id)=>{
+    //       // console.log(text,id)
+
+    //       updateBookMutation({
+    //         variables:{
+    //            objects:[
+    //             {
+    //               id,
+    //               name:text,
+    //               authorId: author.id
+    //             }
+    //            ]
+    //       //     id, name:text
+              
+    //         },
+    //       });
+    //     //  console.log(updatedbooks)
+    //     //   const newBookData= updatedbooks.map((item)=>{
+    //     //     if(item.id===id){
+    //     //       // console.log(text)
+    //     //       return {
+    //     //         ...item,
+    //     //         name: text
+    //     //       };
+    //     //     }
+          
+    //     //  })
+    //     //  console.log(newBookData)
+    //     //  setUpdatedBooks([...newBookData])
+    //  }
+
+    const onSubmit=()=>{
+      // const updatedBookNames = updatedbooks.map((book) => book.name);
+      console.log("Updated Book Names:", updatedbooks);
+
     
     };
 
+   
   return (
     <View style={styles.container}>
       <View  style={{flexDirection:"row"}}>
@@ -83,7 +139,7 @@ const BooksScreen = () => {
     </View >
    
       <FlatList
-        data={author.books}
+        data={data?.book_book}
         keyExtractor={(item) => item.id.toString()}
         renderItem={(item) => {
          
