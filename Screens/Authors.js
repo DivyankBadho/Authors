@@ -39,8 +39,11 @@ const Authors=()=>{
     }, [navigation, refetch]);
 
     const navigateToBooks = (author) => {
-        navigation.navigate("Books", { author });
+        navigation.navigate("Books", {author});
+       
+        // console.log("🚀 ~ file: Authors.js:44 ~ navigateToBooks ~ author:", author)
     }
+    
     return(
         
         <View style={styles.container}>
