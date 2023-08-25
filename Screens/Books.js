@@ -32,16 +32,15 @@ const BooksScreen = () => {
   const route = useRoute();
   const { author } = route.params;
   const[editedbooks, seteditedbooks]= useState(false);
+  const[updatedbooks, setUpdatedBooks]= useState(null);
   
   const {data,error,loading}= useQuery(GET_AUTHOR_BOOKS ,{
     variables: { id: author?.id },
+    onCompleted: ((data) => {
+      setUpdatedBooks(data?.book_book)
+    }),
   });
-  
-  
-  
-  const[updatedbooks, setUpdatedBooks]= useState(data?.book_book);
-  
-  
+
   const [updateBookMutation] = useMutation(UPDATE_BOOK);
     
         // console.log(data)
@@ -53,23 +52,11 @@ const BooksScreen = () => {
 
   const handleInputChange = () => {
           seteditedbooks(true)
-          
     }
   
 
     const updateBookName = (text, id) => {
-      updateBookMutation({
-        variables: {
-          objects: [
-            {
-              id,
-              name: text,
-              authorId: author.id
-            }
-          ]
-        },
-      }).then(() => {
-        
+      
         const newBookData = updatedbooks.map((item) => {
           if (item.id === id) {
             return {
@@ -80,11 +67,11 @@ const BooksScreen = () => {
           return item;
         });
         setUpdatedBooks(newBookData);
-      });
+      
     }
 
     
-    console.log(updatedbooks)
+    // console.log(updatedbooks)
     // const updateBookName=(text,id)=>{
     //       // console.log(text,id)
 
@@ -118,6 +105,17 @@ const BooksScreen = () => {
 
     const onSubmit=()=>{
       // const updatedBookNames = updatedbooks.map((book) => book.name);
+      const updatedBookData = updatedbooks.map(book => ({
+        id: book.id,
+        name: book.name,
+        authorId: author.id
+      }));
+    
+      updateBookMutation({
+        variables: {
+          objects: updatedBookData
+        }
+      })
       console.log("Updated Book Names:", updatedbooks);
 
     
@@ -129,12 +127,18 @@ const BooksScreen = () => {
       <View  style={{flexDirection:"row"}}>
       <Text style={styles.title}>Books for Author: {author.name}</Text> 
       { editedbooks==false ?
-       <Button title="EDIT"  onPress={()=>handleInputChange()} style={{marginLeft: 60, alignItem: "right"}}/>
-      : <Button title="Save"  onPress={()=>{
+      <View style={{marginLeft: 100,borderWidth: 1,borderColor:"black"}}>
+       <Button title="EDIT"  onPress={()=>handleInputChange()} />
+       </View>
+       
+      : 
+      <View style={{marginLeft: 100,borderWidth: 1,borderColor:"black"}}>
+      <Button title="Save"  onPress={()=>{
        
          onSubmit() ;
          seteditedbooks(false);
       }} style={{marginLeft: 60, alignItem: "right"}}/>
+      </View>
       }
     </View >
    
@@ -151,11 +155,16 @@ const BooksScreen = () => {
             defaultValue={item.item.name}
             onChangeText={(text) => updateBookName( text,item.item.id)}
           />
-          ):(
+          ):
+       
+          (
+            <View style={styles.bookContainer}>
            <Text style={styles.bookName}>  {item.item.name}  </Text>
+           {/* <Text style={styles.bookId}> ID: {item.item.id}</Text> */}
+           </View>
            
           )}
-          <Text style={styles.bookId}> ID: {item.item.id}</Text>
+         
 
           
           </> 
@@ -184,6 +193,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 15,
     marginBottom: 10,
+    marginTop:10,
   },
   bookName: {
     fontSize: 16,
@@ -200,6 +210,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     padding: 5,
     marginBottom: 5,
+    marginTop:10,
   },
 });
 
