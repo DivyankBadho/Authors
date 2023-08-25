@@ -62,7 +62,7 @@ const Authors=()=>{
           </Text>
           </View>
         </View>
-        <Text style={{ marginLeft: 70, fontSize: 15 }}> ID:{item.id}</Text>
+        {/* <Text style={{ marginLeft: 70, fontSize: 15 }}> ID:{item.id}</Text> */}
       </View>
       </TouchableOpacity>
      )}
@@ -88,8 +88,9 @@ const styles=StyleSheet.create({
    
   card: {
     backgroundColor: "#f0f0f0",
-    borderRadius: 100, // Half of the width and height to make an oval
-    padding: 20,
+    // borderRadius: 100, // Half of the width and height to make an oval
+    padding: 10,
+    marginHorizontal: 20,
     marginBottom: 20,
     shadowColor: "#000",
     shadowOffset: {
